@@ -8,7 +8,8 @@ import {
   imageExtensions,
   audioExtensions,
   videoExtensions,
-} from "./extensions.js";
+  clearUploadsAfterDelay,
+} from "./utils.js";
 import archiver from "archiver";
 import { config } from "dotenv";
 config();
@@ -39,8 +40,7 @@ export const handleConversion = async (files, convertTo) => {
         } catch (err) {
           res.status(500).send("Error at Sharp Conversion");
         } finally {
-          deleteFileAfterDelay(outputFilePath, 1);
-          deleteFileAfterDelay(file.path, 1);
+          clearUploadsAfterDelay();
         }
 
         results.push({
@@ -99,8 +99,7 @@ export const handleConversion = async (files, convertTo) => {
           await fs.unlink(file.path);
           res.status(500).send("Error at FFmpeg Conversion");
         } finally {
-          deleteFileAfterDelay(outputFilePath, 1);
-          deleteFileAfterDelay(file.path, 1);
+          clearUploadsAfterDelay();
         }
         results.push({
           filename: file.originalname,
@@ -185,17 +184,4 @@ export const handleDownloadAll = async (req, res) => {
   } catch (error) {
     res.sendStatus(408);
   }
-};
-
-export const deleteFileAfterDelay = (filePath, delayInMinutes) => {
-  const delayInMilliseconds = delayInMinutes * 60 * 1000;
-
-  setTimeout(async () => {
-    try {
-      await fs.unlink(filePath);
-      console.log(`${filePath} file has been deleted.`);
-    } catch (error) {
-      console.error(`error at deleting ${filePath}:`, error);
-    }
-  }, delayInMilliseconds);
 };

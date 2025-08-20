@@ -1,3 +1,10 @@
+import fs from "fs/promises";
+import { clearUploadsFolder } from "./clear_uploads.js";
+import { config } from "dotenv";
+config();
+
+const sessionTimeoutDuration = process.env.SERVER_TIMEOUT_DURATION;
+
 export const imageExtensions = [
   "jpg",
   "jpeg",
@@ -32,3 +39,11 @@ export const videoExtensions = [
   "webm",
   "av1", // err
 ];
+
+export const clearUploadsAfterDelay = () => {
+  const delay = sessionTimeoutDuration * 60 * 1000;
+
+  setTimeout(async () => {
+    clearUploadsFolder();
+  }, delay);
+};
